@@ -60,15 +60,16 @@ class WC_Shop_As_Customer_Discount {
 	*/
 	public function init() {
 		
+		add_action( 'wp', array($this, 'maybe_create_coupon' ) );
+		
 		if( class_exists('WC_Shop_As_Customer') && WC_Shop_As_Customer::get_original_user() ) {
 			
 			add_action( 'woocommerce_after_order_notes', array($this, 'display_discount_field') );
 			
-			add_filter( 'woocommerce_get_shop_coupon_data', array($this, 'customer_discount') );
-			
 			add_action( 'woocommerce_checkout_update_order_review', array($this, 'maybe_add_cart_discount') );
 			
 			add_action( 'shop_as_customer', array($this, 'remove_session_var') );
+			
 			add_action( 'switch_back_user', array($this, 'remove_session_var') );
 			
 		}
@@ -103,18 +104,21 @@ class WC_Shop_As_Customer_Discount {
 		
 	}
 	
-	public function customer_discount($get_shop_coupon_data) {
+	public function maybe_create_coupon() {
 		
-		if( ! is_admin() || is_ajax() ) {
+		$coupon_id = wc_get_coupon_id_by_code( $this->coupon_code );
+		
+		if( ! $coupon_id ) {
 			
-			$get_shop_coupon_data = array(
-				'discount_type'              => 'percent',
-				'coupon_amount'              => WC()->session->get('_discount') ? WC()->session->get('_discount') : 0
-			);
+			$coupon_id = wp_insert_post(array(
+				'post_type' => 'shop_coupon',
+				'post_status' => 'publish',
+				'post_title' => $this->coupon_code
+			));
+			
+			update_post_meta( $coupon_id, 'discount_type', 'percent_product' );
 			
 		}
-		
-		return $get_shop_coupon_data;
 		
 	}
 	
@@ -127,6 +131,16 @@ class WC_Shop_As_Customer_Discount {
 			WC()->session->set('_discount', $post_data['_discount']);
 			
 			WC()->cart->remove_coupon( $this->coupon_code );
+			
+			if( ! is_admin() || is_ajax() ) {
+			
+				if( $coupon_id = wc_get_coupon_id_by_code( $this->coupon_code ) ) {
+					
+					update_post_meta( $coupon_id, 'coupon_amount', WC()->session->get('_discount') ? WC()->session->get('_discount') : 0 );
+				
+				}
+				
+			}
 				
 			WC()->cart->add_discount( $this->coupon_code );
 			
