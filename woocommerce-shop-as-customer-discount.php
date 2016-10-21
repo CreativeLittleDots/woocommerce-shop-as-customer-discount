@@ -106,9 +106,9 @@ class WC_Shop_As_Customer_Discount {
 	
 	public function maybe_create_coupon() {
 		
-		$coupon_id = wc_get_coupon_id_by_code( $this->coupon_code );
+		$coupon = new WC_Coupon( $this->coupon_code );
 		
-		if( ! $coupon_id ) {
+		if( ! $coupon_id = $coupon->id ) {
 			
 			$coupon_id = wp_insert_post(array(
 				'post_type' => 'shop_coupon',

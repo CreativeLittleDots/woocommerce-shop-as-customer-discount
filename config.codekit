@@ -23,6 +23,17 @@
 		"randomFootnoteNumbers": 0,
 		"useCompatibilityMode": 0
 		},
+	"\/screenshots\/example-1.png": {
+		"fileType": 32768,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"initialSize": 152415,
+		"inputAbbreviatedPath": "\/screenshots\/example-1.png",
+		"outputAbbreviatedPath": "\/screenshots\/example-1.png",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"processed": 0
+		},
 	"\/templates\/checkout\/discount.php": {
 		"fileType": 8192,
 		"ignore": 0,
